@@ -1,0 +1,10 @@
+{
+  "expo": {
+    "name": "barbeariaMax",
+    "slug": "barbeariaMax",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
