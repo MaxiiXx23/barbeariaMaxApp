@@ -5,6 +5,7 @@ import { useTheme } from 'styled-components';
 
 import { Home } from '../screens/Home';
 import { Profile } from '../screens/Profile';
+import { Configure } from '../screens/Configure';
 
 const { Navigator, Screen } = createMaterialBottomTabNavigator();
 
@@ -63,7 +64,7 @@ export function TabRoutes() {
 
             <Screen
                 name="Config"
-                component={Home}
+                component={Configure}
                 options={{
                     tabBarLabel: 'Configurações',
                     tabBarIcon: ({ color }) => (

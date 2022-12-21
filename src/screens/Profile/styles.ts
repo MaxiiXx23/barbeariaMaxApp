@@ -64,6 +64,6 @@ export const TextEdit = styled.Text`
 color: ${({ theme }) => theme.colors.shape};
     
     font-size: ${RFValue(20)}px;  
-    color: ${({ theme }) => theme.colors.text};
+    color: ${({ theme }) => theme.colors.background_secondary};
     padding: 4px;
 `;
