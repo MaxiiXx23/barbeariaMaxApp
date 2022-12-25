@@ -3,18 +3,21 @@ import { StatusBar } from 'react-native';
 import { ThemeProvider } from 'styled-components';
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
-import { Welcome } from './src/screens/Welcome';
+
 import { theme } from './src/styles/theme';
 import { Routes } from './src/routes/index.routes';
+import { AppProvider } from './src/hooks';
 
 export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <StatusBar 
+        <StatusBar
           barStyle='light-content'
         />
-        <Routes />
+        <AppProvider>
+          <Routes />
+        </AppProvider>
       </GestureHandlerRootView>
     </ThemeProvider>
   );

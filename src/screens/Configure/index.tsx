@@ -1,4 +1,5 @@
 import React from 'react';
+
 import {
     Container,
     Title,
@@ -8,7 +9,17 @@ import {
 
 import { SelectConfig } from '../../components/SelectConfig';
 
+import { useAuth } from '../../hooks/auth';
+
 export function Configure() {
+
+    const { signOut } = useAuth();
+
+
+    async function handleSignOut (){
+        await signOut();
+    }
+
     return (
         <Container>
             <Title>Configurações</Title>
@@ -38,6 +49,7 @@ export function Configure() {
                         iconName="logout"
                         title='Sair'
                         description='Desconecte da aplicação.'
+                        onPress={handleSignOut}
                     />
                 </ListConfigs>
             </ContainerConfigs>

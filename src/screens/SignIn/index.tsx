@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Alert } from 'react-native';
 
 import { useTheme } from 'styled-components';
 import Animated, {
@@ -7,12 +8,12 @@ import Animated, {
   withTiming,
   interpolate,
 } from 'react-native-reanimated';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import * as Yup from "yup";
 
 import {
   Container,
   Header,
-  WrapperForm,
   Form,
   Title,
   WrapperLine,
@@ -29,22 +30,27 @@ import { ButtonBack } from '../../components/ButtonBack';
 import { Input } from '../../components/Input';
 import { InputPassword } from '../../components/InputPassword';
 import { Button } from '../../components/Button';
-import { useNavigation } from '@react-navigation/native';
 
+import { useAuth } from '../../hooks/auth';
+import { NavigationProps } from '../../navigation/navigationStackProps';
 
-type RootStackParamList = {
-  SignUp: undefined;
-  SignIn: undefined;
-  Welcome: undefined;
-};
+interface Params {
+  title: string;
+  content: string;
+}
 
-type NavigationProps = NativeStackNavigationProp<RootStackParamList, "SignUp">;
 
 export function SignIn() {
 
   const theme = useTheme();
   const navigation = useNavigation<NavigationProps>();
+  const route = useRoute();
   const formAnimation = useSharedValue(0);
+  const { signIn } = useAuth();
+
+  const { title, content } = route.params as Params;
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const formStyle = useAnimatedStyle(() => {
     return {
@@ -68,12 +74,43 @@ export function SignIn() {
     navigation.navigate("SignUp");
   }
 
+  async function handleSubmit() {
+    try {
+      const schema = Yup.object().shape({
+        email: Yup.string()
+          .required('E-mail é obrigatório.')
+          .email('E-mail inválido.'),
+        password: Yup.string()
+          .required('Senha é obrigatória.')
+      })
+
+      await schema.validate({ email, password });
+
+      await signIn({
+        email,
+        password
+      })
+
+    } catch (error) {
+      if (error instanceof Yup.ValidationError) {
+        return Alert.alert('Opa!', error.message);
+      } else {
+        return Alert.alert(
+          'Error na autenticação.',
+          'Ocorreu um erro ao fazer login, verifica sua conexão ou/e credênciais.')
+      }
+    }
+  }
+
 
   useEffect(() => {
     formAnimation.value = withTiming(
       50,
       { duration: 3000 }
     )
+    if(title){
+      return Alert.alert(title, content);
+    }
   }, [])
 
   return (
@@ -85,18 +122,22 @@ export function SignIn() {
         />
       </Header>
 
-      <Animated.View style={[formStyle, {position: "relative"}]}>
+      <Animated.View style={[formStyle, { position: "relative" }]}>
         <Form>
           <Title>Entrar</Title>
 
           <Input
             iconName='person'
             placeholder='E-mail'
+            onChangeText={setEmail}
+            value={email}
           />
 
           <InputPassword
             iconName='lock'
             placeholder='Senha'
+            onChangeText={setPassword}
+            value={password}
           />
 
           <WrapperForgotPassword>
@@ -106,7 +147,7 @@ export function SignIn() {
           <Button
             title='Entrar'
             color={theme.colors.shape}
-            onPress={() => { console.log("kkkkk") }}
+            onPress={handleSubmit}
           />
 
           <WrapperLine>

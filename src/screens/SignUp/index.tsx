@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { Alert } from 'react-native';
+
 import { useTheme } from 'styled-components';
 import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import * as Yup from "yup";
 
 import Animated, {
   useSharedValue,
@@ -9,6 +11,7 @@ import Animated, {
   withTiming,
   interpolate,
 } from 'react-native-reanimated';
+
 
 import {
   Container,
@@ -28,23 +31,18 @@ import { Input } from '../../components/Input';
 import { Button } from '../../components/Button';
 import { ButtonIcon } from '../../components/ButtonIcon';
 import { InputPassword } from '../../components/InputPassword';
+import { api } from '../../services/axios';
+import { NavigationProps } from '../../navigation/navigationStackProps';
 
-
-
-type RootStackParamList = {
-  SignUp: undefined;
-  SignIn: undefined;
-  Welcome: undefined;
-
-};
-
-type NavigationProps = NativeStackNavigationProp<RootStackParamList, "SignUp">;
 
 export function SignUp() {
   const navigation = useNavigation<NavigationProps>();
   const theme = useTheme();
   const formAnimation = useSharedValue(0);
 
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [repetPassword, setRepetPassword] = useState('');
 
@@ -70,6 +68,61 @@ export function SignUp() {
       navigation.navigate("SignIn");
   }
 
+  async function handleSignUp(){
+
+    try{
+
+      const schema = Yup.object().shape({
+        name: Yup.string()
+            .required('Nome é obrigatório.'),
+        phone: Yup.string()
+          .required('Número de telefone é obrigatório.')
+          .length(11, 'Número de telefone inválido'),
+        email: Yup.string()
+          .required('E-mail é obrigatório.')
+          .email('E-mail inválido'),
+        password: Yup.string()
+          .required('Senha é obrigatória.'),
+        repetPassword: Yup.string()
+          .required('Confimação de senha é obrigatória.')
+      });
+
+      if(password !== repetPassword){
+        return Alert.alert('Opa!', 'As senhas precisam ser iguais.')
+      }
+  
+      await schema.validate({name, phone, email, password, repetPassword});
+
+      // SignUp user
+
+      await api.post("/users/", {
+        name,
+        email,
+        phone,
+        password
+      })
+      .then(() => {
+        navigation.navigate("SignIn", {
+          title: "Conta criada com sucesso!",
+          content: "Conecte-se com seus dados e aproveite!"
+        })
+      })
+
+    }catch(error){
+      if(error instanceof Yup.ValidationError){
+        return Alert.alert('Opa!', error.message);
+      }else {
+        console.log(error.message)
+        return Alert.alert(
+          'Error no cadastro', 
+          'Ocorreu um error no cadastro, verifique sua conexão com a internet e tente novamente');
+      }
+    }
+
+
+
+  }
+
   useEffect(() => {
     formAnimation.value = withTiming(
       50,
@@ -90,18 +143,33 @@ export function SignUp() {
           <Title>Cadastro</Title>
           <Input
             iconName='person'
-            placeholder='Nome Completo'
+            placeholder='Nome e Sobrenome'
+            maxLength={40}
+            value={name}
+            onChangeText={setName}
+          />
+
+          <Input
+            iconName='phone'
+            placeholder='Número de telefone com DD'
+            keyboardType='phone-pad'
+            maxLength={11}
+            value={phone}
+            onChangeText={setPhone}
           />
 
           <Input
             iconName='mail'
             placeholder='E-mail'
-
+            maxLength={32}
+            value={email}
+            onChangeText={setEmail}
           />
 
           <InputPassword
             iconName='lock'
             placeholder='Senha'
+            maxLength={16}
             onChangeText={setPassword}
             value={password}
           />
@@ -109,13 +177,16 @@ export function SignUp() {
           <InputPassword
             iconName='lock'
             placeholder='Repetir Senha'
+            maxLength={16}
             onChangeText={setRepetPassword}
             value={repetPassword}
+            
           />
 
           <Button
             title='Cadastrar-se'
             color={theme.colors.shape}
+            onPress={handleSignUp}
           />
 
           <WrapperLine>

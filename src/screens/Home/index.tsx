@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { FlatList } from 'react-native';
 
 import { MaterialIcons } from "@expo/vector-icons";
 import { BorderlessButton } from 'react-native-gesture-handler';
 import { useTheme } from 'styled-components';
+import { BASE_URL } from '@env';
+
+import { useAuth } from '../../hooks/auth';
 
 import {
     Container,
@@ -21,9 +24,17 @@ import {
 import { ButtonCategories } from '../../components/ButtonCategories';
 import { ServiceCard } from '../../components/ServiceCard';
 
+
 export function Home() {
 
     const theme = useTheme();
+    const { user } = useAuth();
+    
+    useEffect(() => {
+
+    },[])
+
+
 
     const categories = [
         {
@@ -54,7 +65,7 @@ export function Home() {
 
             <Header>
                 <ImageProfile
-                    source={{ uri: "https://avatars.githubusercontent.com/u/48772842?v=4" }}
+                    source={{ uri: `${BASE_URL}${user.photo}` }}
                 />
 
                 <ContainerButton>

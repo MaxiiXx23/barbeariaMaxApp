@@ -9,6 +9,9 @@ import {
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTheme } from 'styled-components';
 
+import { useAuth } from '../../hooks/auth';
+import { BASE_URL } from '@env';
+
 import {
     Container,
     Header,
@@ -25,9 +28,12 @@ import { Input } from '../../components/Input';
 import { ButtonIcon } from '../../components/ButtonIcon';
 
 
+
+
 export function Profile() {
 
     const theme = useTheme();
+    const { user } = useAuth();
 
     return (
         <KeyboardAvoidingView behavior='height' enabled>
@@ -36,7 +42,7 @@ export function Profile() {
                     <Header>
                         <WrapperPhotoBtn>
                             <Photo
-                                source={{ uri: "https://avatars.githubusercontent.com/u/48772842?v=4" }}
+                                source={{ uri: `${BASE_URL}${user.photo}` }}
                             />
                             <Icon
                                 onPress={() => console.log("Mudei a foto")}
@@ -49,7 +55,7 @@ export function Profile() {
                             </Icon>
                         </WrapperPhotoBtn>
                         <NameUser>
-                            Max Jonatas
+                            {user.name}
                         </NameUser>
                     </Header>
 
@@ -61,20 +67,20 @@ export function Profile() {
                             <Input
                                 iconName="person"
                                 textAlign='center'
-                                value="Max Jonatas Da Silva Lima"
+                                value={user.name}
                             />
 
                             <Input
                                 iconName="mail"
                                 textAlign='center'
-                                value="max.test@gmail.com"
+                                value={user.email}
                                 keyboardType='email-address'
                             />
 
                             <Input
                                 iconName="phone"
                                 textAlign='center'
-                                value="(11)00000000"
+                                value={user.phone}
                                 keyboardType='phone-pad'
                             />
 

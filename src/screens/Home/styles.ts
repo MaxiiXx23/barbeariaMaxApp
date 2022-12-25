@@ -13,7 +13,7 @@ export const Header = styled.View`
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    borderBottomRightRadius: 60px;
+    border-bottom-right-radius: 60px;
 `;
 
 export const ImageProfile = styled(Image)`
