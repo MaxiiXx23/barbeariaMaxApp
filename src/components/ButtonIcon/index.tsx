@@ -15,10 +15,11 @@ interface Props extends RectButtonProps {
 
 
 
-export function ButtonIcon({ title, iconName, color }: Props) {
+export function ButtonIcon({ title, iconName, color, ...rest }: Props) {
     return (
         <Container
             colorButton={color}
+            {...rest}
         >
 
         <AntDesign 
