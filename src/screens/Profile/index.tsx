@@ -97,26 +97,28 @@ export function Profile() {
             const data = new FormData();
 
             const path = assets[0].uri.split('/');
-            const name = path[path.length - 1];
+            const nameImg = path[path.length - 1];
 
             const infosFile = {
                 uri: assets[0].uri,
                 type: assets[0].type,
-                name: "img"
+                name: nameImg
             }
 
             data.append("photo", JSON.stringify(infosFile))
-            console.log(data)
-            // criar rota para upload de foto de perfil do usuário
-            await api.patch("/users/upload/photo", data, 
-            {
-                headers: {
-                    "Content-Type": "multipart/form-data",    
+            // BUG no Upload de foto CORRIGIR!
+            await fetch(`${BASE_URL}/users/upload/photo`, {
+                method: "PATCH",
+                headers:{
+                    "Content-Type": "multipart/form-data",
                 },
-
+                body: JSON.stringify(data)
             })
-                .then(() => console.log("Photo uploaded."))
-                .catch((error) => console.log(error.message))
+            .then((response) => {
+                let json = response.json()
+                console.log(json)
+            })
+            .catch((error) => console.log(error.message))
         }
 
     }
@@ -130,9 +132,7 @@ export function Profile() {
                             <Photo
                                 source={{ uri: uriImgPhone ? uriImgPhone : `${BASE_URL}${photo}` }}
                             />
-                            <Icon
-                                onPress={handleChangeImage}
-                            >
+                            <Icon onPress={handleChangeImage}>
                                 <MaterialCommunityIcons
                                     name="camera"
                                     size={30}
